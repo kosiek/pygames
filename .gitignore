@@ -1,0 +1,12 @@
+
+.python-version
+.whl
+dist/*.whl
+dist/*.tar.gz
+.DS_Store
+
+.venv/
+.mypy_cache/
+.pytest_cache/
+dist/
+__pycache__/

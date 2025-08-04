@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # This is a two player card game
 # The game starts with a deck of 52 cards represented as unique integers [1...52]
 # The cards are randomly shuffled and then dealt out to both players evenly
@@ -20,12 +19,11 @@
 # -> Winning player takes both cards to their winning stack
 # -> At the end of the round, we count the amount of cards in the winning stack of each player. A game ends with a win or a tiebraker
 # -> Tiebreaker: we find which player has a highest cards.
-from asyncio import sleep, run
+
 from dataclasses import dataclass, field
 from collections import deque
 from random import shuffle
 from uuid import UUID, uuid4
-import traceback
 
 CardValue = int
 PlayerID = UUID
@@ -79,11 +77,15 @@ class PlayerRoundDraw:
     def __str__(self):
         return f"Player {self.player_id} drew card {self.card_value}."
 
-    def __gt__(self, other: "PlayerRoundDraw"):
+    def __gt__(self, other: object):
+        if not isinstance(other, PlayerRoundDraw):
+            raise TypeError(f"Cannot compare PlayerRoundDraw with {type(other).__name__}.")
         return self.card_value > other.card_value
 
-    def __eq__(self, other: "PlayerRoundDraw"):
-        return self.card_value == other.card_value
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, PlayerRoundDraw):
+            return False
+        return self.card_value == other.card_value and self.player_id == other.player_id
 
 
 @dataclass
@@ -116,7 +118,7 @@ class CardGameRound:
     def __str__(self):
         info = "Round: "
         for player_draw in self.draw:
-            info += f"Player '{self.players[player_draw.player_id].name}' drew {player_draw.card_value}. "
+            info += f"Player '{self.players[player_draw.player_id].name}' drew {player_draw.card_value}."
         return info
 
 
@@ -170,32 +172,3 @@ class CardGameService:
         for card in round.get_cards_in_round():
             winner.winning_stack.append(card)
         return state
-
-
-async def main_game():
-    game = CardGameService.initialize_game()
-    print("Game initialized.")
-
-    game = CardGameService.deal_cards_to_players(game)
-    while CardGameService.is_game_in_progress(game):
-        print(f"Player A has the following cards: {game.player_a.cards_stack}")
-        print(f"Player B has the following cards: {game.player_b.cards_stack}")
-        round = CardGameService.play_next_round(game)
-        print(round)
-        game = CardGameService.apply_round_result(game, round)
-        print(f"{round.round_winner.name} has won this round.")
-        await sleep(1)
-
-    winner = game.select_winner()
-    print(f"End game winner: {winner}")
-
-
-if __name__ == "__main__":
-    try:
-        run(main_game())
-    except KeyboardInterrupt:
-        print("\r  \nInterrupted. The game result will not apply.\nGoodbye!")
-    except Exception:
-        print(f"An unhandled error occurred: {traceback.format_exc()}")
-        print("The game will now terminate.")
-        exit(1)

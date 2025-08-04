@@ -1,0 +1,37 @@
+[project]
+name = "pywar"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+classifiers = ["Private :: Do Not Upload"]
+
+# Set of information about UV recommended .toml for packages apps:
+# https://github.com/astral-sh/uv/issues/7576
+
+[dependency-groups]
+dev = ["mypy>=1.17.1", "pytest>=8.4.1", "ruff>=0.12.7"]
+
+[tool.uv]
+package = true
+
+# BELOW ARE REQUIRED FOR PACKAGED APPS
+[tool.hatch.build.targets.wheel]
+packages = ["src/pywar"]
+
+[project.scripts]
+# For some reason this script is not working:
+# Instead, call python -m pywar directly
+pywar = "pywar:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# LINTING CONFIGURATION:
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+max-line-length = 100
