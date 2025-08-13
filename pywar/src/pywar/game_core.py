@@ -20,106 +20,14 @@
 # -> At the end of the round, we count the amount of cards in the winning stack of each player. A game ends with a win or a tiebraker
 # -> Tiebreaker: we find which player has a highest cards.
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from collections import deque
 from random import shuffle
-from uuid import UUID, uuid4
 
-CardValue = int
-PlayerID = UUID
-
-
-@dataclass
-class GamePlayer:
-    name: str
-    id: PlayerID = field(default_factory=uuid4)
-    winning_stack: deque[CardValue] = field(default_factory=deque[CardValue])
-    cards_stack: deque[CardValue] = field(default_factory=deque[CardValue])
-
-    def __str__(self):
-        return f"<name: {self.name}>"
-
-
-@dataclass
-class CardGameState:
-    player_a: GamePlayer
-    player_b: GamePlayer
-
-    @staticmethod
-    def tiebreaker(player_a: GamePlayer, player_b: GamePlayer) -> GamePlayer:
-        highest_card_player_a = max(player_a.winning_stack)
-        highest_card_player_b = max(player_b.winning_stack)
-        winning_player = player_a if highest_card_player_a > highest_card_player_b else player_b
-        highest_card = max(highest_card_player_a, highest_card_player_b)
-        print(f"Player {winning_player} has scored a highest value card ({highest_card})")
-        return winning_player
-
-    def select_winner(self) -> GamePlayer:
-        winning_player = None
-        print(f"{self.player_a.name!r} has {len(self.player_a.winning_stack)} points.")
-        print(f"{self.player_b.name!r} has {len(self.player_b.winning_stack)} points.")
-        if len(self.player_a.winning_stack) == len(self.player_b.winning_stack):
-            print("Winner will be decided by a tiebreak:")
-            winning_player = CardGameState.tiebreaker(self.player_a, self.player_b)
-        elif len(self.player_a.winning_stack) > len(self.player_b.winning_stack):
-            winning_player = self.player_a
-        else:
-            winning_player = self.player_b
-        print(f"{winning_player.name!r} won the game.")
-        return winning_player
-
-
-@dataclass
-class PlayerRoundDraw:
-    player_id: PlayerID
-    card_value: CardValue
-
-    def __str__(self):
-        return f"Player {self.player_id} drew card {self.card_value}."
-
-    def __gt__(self, other: object):
-        if not isinstance(other, PlayerRoundDraw):
-            raise TypeError(f"Cannot compare PlayerRoundDraw with {type(other).__name__}.")
-        return self.card_value > other.card_value
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, PlayerRoundDraw):
-            return False
-        return self.card_value == other.card_value and self.player_id == other.player_id
-
-
-@dataclass
-class CardGameRound:
-    draw: list[PlayerRoundDraw] = field(init=False)
-    players: dict[PlayerID, GamePlayer] = field(init=False)
-    round_winner: GamePlayer = field(init=False)
-
-    def __init__(self, state: CardGameState) -> None:
-        players = [state.player_a, state.player_b]
-        self.players = {player.id: player for player in players}
-        self.draw = [PlayerRoundDraw(player.id, player.cards_stack[-1]) for player in players]
-
-    def choose_round_winner(self) -> GamePlayer:
-        """
-        Returns:
-            GamePlayer: a winning player of this round.
-        """
-        winning_card = max(self.draw, key=lambda i: i.card_value)
-        self.round_winner = self.players[winning_card.player_id]
-        return self.round_winner
-
-    def get_cards_in_round(self) -> list[CardValue]:
-        """
-        Returns:
-            list[CardValue]: a list of card values drawn in this round.
-        """
-        return [draw.card_value for draw in self.draw]
-
-    def __str__(self):
-        info = "Round: "
-        for player_draw in self.draw:
-            info += f"Player '{self.players[player_draw.player_id].name}' drew {player_draw.card_value}."
-        return info
+from .data import GamePlayer
+from .game_state import CardGameState, CardGameRound
+from .game_history_service import GameHistoryService
+from .db.models import CardGameHistoryItem
 
 
 @dataclass
@@ -138,8 +46,8 @@ class CardGameService:
 
     @classmethod
     def initialize_game(cls) -> CardGameState:
-        player_a = GamePlayer("Player A")
-        player_b = GamePlayer("Player B")
+        player_a = GamePlayer("Ryan")
+        player_b = GamePlayer("Hugh")
         return CardGameState(player_a, player_b)
 
     @classmethod
@@ -154,7 +62,7 @@ class CardGameService:
     @staticmethod
     def is_game_in_progress(state: CardGameState) -> bool:
         """Returns True if the game is still in progress, False otherwise."""
-        return bool(len(state.player_a.cards_stack) and len(state.player_b.cards_stack))
+        return not state.is_game_over
 
     @classmethod
     def play_next_round(cls, state: CardGameState) -> CardGameRound:
@@ -172,3 +80,19 @@ class CardGameService:
         for card in round.get_cards_in_round():
             winner.winning_stack.append(card)
         return state
+
+    @classmethod
+    async def get_games_from_history_async(cls) -> list[CardGameHistoryItem]:
+        """
+        Returns:
+            list[CardGameRound]: The current games round history.
+        """
+        return await GameHistoryService.get_games_from_history_async()
+
+    @classmethod
+    async def save_game_to_history_async(cls, state: CardGameState) -> None:
+        """
+        Saves the current game state to the history.
+        """
+        await GameHistoryService.save_game_to_history_async(state)
+        print(f"Game saved: {state.player_a.name} vs {state.player_b.name}")

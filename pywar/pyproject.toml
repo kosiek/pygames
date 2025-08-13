@@ -4,7 +4,10 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "django>=5.2.5",
+    "django-types>=0.22.0",
+]
 classifiers = ["Private :: Do Not Upload"]
 
 # Set of information about UV recommended .toml for packages apps:
