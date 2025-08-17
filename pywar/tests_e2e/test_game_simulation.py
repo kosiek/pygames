@@ -48,6 +48,6 @@ class TestEndToEndGameSimulation:
                 f", Player A: {i.player_a.name!r}"
                 f", Player B: {i.player_b.name!r}"
                 f", Winner: {i.winner.name!r}.\n"
-                f"\tWinner had {i.game_context['player_a_score']} points.\n"
-                f"\tLoser had {i.game_context['player_b_score']} points.\n",
+                f"\t{i.player_a.name!r} had {i.game_context['player_a_score']} points.\n"
+                f"\t{i.player_b.name!r} had {i.game_context['player_b_score']} points.\n",
             )
