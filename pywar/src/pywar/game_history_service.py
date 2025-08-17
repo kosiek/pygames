@@ -68,7 +68,7 @@ class GameHistoryService:
         """
         Retrieves all game history records.
         """
-        ## TODO: maybe I can get rid of @sync_to_async if I use .filter()?
+        # TODO: maybe I can get rid of @sync_to_async if I use .filter()?
         data = CardGameHistoryItem.objects.all()
         return list(data)
 
