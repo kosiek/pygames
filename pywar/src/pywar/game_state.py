@@ -49,7 +49,7 @@ class CardGameState:
             return self.tiebreaker(self.player_a, self.player_b)
         else:  # pragma: no cover
             # Theoretically this is unreachable code and excessive defensive programming.
-            # Anyway I'll keep it, beceause it's more important for me to document the logic.
+            # Anyway I'll keep it, because it's more important for me to document the logic.
             raise ValueError("Game is a unsolvable tie, no winner can be selected.")
 
     @property
