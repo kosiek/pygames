@@ -89,7 +89,7 @@ class CardGameService:
     async def get_games_from_history_async(cls) -> list[CardGameHistoryItem]:
         """
         Returns:
-            list[CardGameRound]: The current games round history.
+            list[CardGameHistoryItem]: The current games round history.
         """
         return await GameHistoryService.get_games_from_history_async()
 
