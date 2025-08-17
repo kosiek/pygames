@@ -23,6 +23,7 @@
 from dataclasses import dataclass
 from collections import deque
 from random import shuffle
+from typing import ClassVar
 
 from .data import GamePlayer
 from .game_state import CardGameState, CardGameRound
@@ -34,7 +35,7 @@ from .db.models import CardGameHistoryItem
 class CardGameService:
     """A class that contains a toolkit for the card game."""
 
-    DRAW_RANGE = list(range(1, 53))
+    DRAW_RANGE: ClassVar[list[int]] = list(range(1, 53))
 
     def __init__(self):
         raise NotImplementedError(
@@ -52,6 +53,9 @@ class CardGameService:
 
     @classmethod
     def deal_cards_to_players(cls, state: CardGameState) -> CardGameState:
+        if len(cls.DRAW_RANGE) % 2 != 0:
+            raise ValueError("The number of cards must be an even number.")
+
         cards_list = deque(cls.DRAW_RANGE)
         shuffle(cards_list)
         while len(cards_list):
@@ -68,7 +72,7 @@ class CardGameService:
     def play_next_round(cls, state: CardGameState) -> CardGameRound:
         if not state.player_a.cards_stack:
             raise RuntimeError("This game has ended, it is not possible to play another round.")
-        return CardGameRound(state)
+        return CardGameRound([state.player_a, state.player_b])
 
     @classmethod
     def apply_round_result(cls, state: CardGameState, round: CardGameRound) -> CardGameState:

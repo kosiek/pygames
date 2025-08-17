@@ -33,14 +33,6 @@ class CardGameState:
     player_b: GamePlayer
     tiebreaker: Callable[[GamePlayer, GamePlayer], GamePlayer] = tiebreaker_by_maximum_card
 
-    # NOTE: I can't add rounds to the game state right now, because I would have to remove the state
-    # from the CardGameRound constructor first.
-    #
-    # I would like to do it, because then I can better structure the data and log history of the
-    # game session.
-    #
-    # I guess this is the next step for me.
-
     def select_winner(self) -> GamePlayer:
         if not self.is_game_over:
             raise RuntimeError("This game is not over yet, it is not possible to select a winner.")
@@ -55,12 +47,14 @@ class CardGameState:
         if self.is_tiebreak:
             print("Winner will be decided by a tiebreaker:")
             return self.tiebreaker(self.player_a, self.player_b)
-        else:
+        else:  # pragma: no cover
+            # Theoretically this is uncreachable code and excessive defensive programming.
+            # Anyway I'll keep it, beceause it's more important for me to document the logic.
             raise ValueError("Game is a unsolvable tie, no winner can be selected.")
 
     @property
     def is_game_over(self) -> bool:
-        return not (len(self.player_a.cards_stack) and len(self.player_b.cards_stack))
+        return not (self.player_a.cards_stack and self.player_b.cards_stack)
 
     @property
     def is_tiebreak(self) -> bool:
@@ -69,14 +63,17 @@ class CardGameState:
 
 @dataclass
 class CardGameRound:
-    draw: list[PlayerRoundDraw] = field(init=False)
+    _players_list: list[GamePlayer]
+
     players: dict[PlayerID, GamePlayer] = field(init=False)
+    draw: list[PlayerRoundDraw] = field(init=False)
     round_winner: GamePlayer = field(init=False)
 
-    def __init__(self, state: CardGameState) -> None:
-        players = [state.player_a, state.player_b]
-        self.players = {player.id: player for player in players}
-        self.draw = [PlayerRoundDraw(player.id, player.cards_stack[-1]) for player in players]
+    def __post_init__(self) -> None:
+        self.players = {player.id: player for player in self._players_list}
+        self.draw = [
+            PlayerRoundDraw(player.id, player.cards_stack[-1]) for player in self._players_list
+        ]
 
     def get_cards_in_round(self) -> list[CardValue]:
         """
@@ -97,5 +94,5 @@ class CardGameRound:
     def __str__(self):
         info = "Round: "
         for player_draw in self.draw:
-            info += f"Player '{self.players[player_draw.player_id].name}' drew {player_draw.card_value}."
+            info += f"Player '{self.players[player_draw.player_id].name}' drew {player_draw.card_value}. "
         return info

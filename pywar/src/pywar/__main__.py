@@ -68,11 +68,11 @@ async def main_game():
     print("Game history saved.")
 
     games = await CardGameService.get_games_from_history_async()
-    print(f"Retrieved game history: {games}")
 
     if not games:
         print("No games found in history.")
     else:
+        print(f"{len(games)} games found in history:")
         for i in games:
             print(
                 f"Game ID: {i.game_id}"

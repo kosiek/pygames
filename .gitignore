@@ -1,15 +1,18 @@
 
+# Local environment and metadata files:
 .python-version
-.whl
+.DS_Store
+.coverage
+
+# Artifacts:
 dist/*.whl
 dist/*.tar.gz
-.DS_Store
 
-# database files:
-.sqlite3
+# Database files:
+*.sqlite3
 
+# General Python-related directories:
 .venv/
 .mypy_cache/
 .pytest_cache/
-dist/
 __pycache__/

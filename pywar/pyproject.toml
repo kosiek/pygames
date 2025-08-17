@@ -13,15 +13,6 @@ classifiers = ["Private :: Do Not Upload"]
 # Set of information about UV recommended .toml for packages apps:
 # https://github.com/astral-sh/uv/issues/7576
 
-[dependency-groups]
-dev = ["mypy>=1.17.1", "pytest>=8.4.1", "ruff>=0.12.7"]
-
-[tool.uv]
-package = true
-
-# BELOW ARE REQUIRED FOR PACKAGED APPS
-[tool.hatch.build.targets.wheel]
-packages = ["src/pywar"]
 
 [project.scripts]
 # For some reason this script is not working:
@@ -32,9 +23,40 @@ pywar = "pywar:main"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# BELOW ARE REQUIRED FOR PACKAGED APPS:
+[tool.hatch.build.targets.wheel]
+packages = ["src/pywar"]
+
+[tool.uv]
+package = true
+
+[dependency-groups]
+dev = [
+    "assertpy>=1.1",
+    "mypy>=1.17.1",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
+    "pytest-django>=4.11.1",
+    "ruff>=0.12.7",
+    "types-assertpy>=1.1.0.20250502",
+]
+
+
 # LINTING CONFIGURATION:
 [tool.ruff]
 line-length = 100
 
-[tool.mypy]
-max-line-length = 100
+[tool.coverage.report]
+exclude_also = [
+    'def __repr__',
+    'if self.debug:',
+    'if settings.DEBUG',
+    'raise AssertionError',
+    'raise NotImplementedError',
+    'if 0:',
+    'if __name__ == .__main__.:',
+    'if TYPE_CHECKING:',
+    'class .*\bProtocol\):',
+    '@(abc\.)?abstractmethod',
+]
