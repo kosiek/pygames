@@ -48,7 +48,7 @@ class CardGameState:
             print("Winner will be decided by a tiebreaker:")
             return self.tiebreaker(self.player_a, self.player_b)
         else:  # pragma: no cover
-            # Theoretically this is uncreachable code and excessive defensive programming.
+            # Theoretically this is unreachable code and excessive defensive programming.
             # Anyway I'll keep it, beceause it's more important for me to document the logic.
             raise ValueError("Game is a unsolvable tie, no winner can be selected.")
 
