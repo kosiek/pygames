@@ -1,12 +1,16 @@
-# Overview
+# PyWar project overview
 
-This repository contains a complete simulated implementation of the classic card game "War".
+`pywar` is an example Python source written for UV, in order to provide me with a boilerplate of
+a software development project / package that provides some actual functionality.
+
+At the current stage, the purpose is to simulate a simplified 'war' card game.
 
 > **Note:** This description was written using GitHub Copilot in Agent mode to verify its capabilities.
 
 ### What is War?
 
-War is a simplified card game where two players compete using a standard 52-card deck. The game is entirely based on chance, making it perfect for automated simulation. Here's how it works:
+War is a simplified card game where two players compete using a standard 52-card deck. The game is 
+entirely based on chance, making it perfect for automated simulation. Here's how it works:
 
 #### Game Setup
 - A deck of 52 cards (represented as integers 1-52) is shuffled randomly
@@ -55,3 +59,36 @@ Made on macOS. The following pre-requisites must be set in place:
 Setup steps:
 1. `git clone` of the repository,
 2. Install the libraries using `uv install`.
+
+# License
+
+This project is licensed under the MIT License:
+
+```
+MIT License
+
+Copyright (c) 2024 Przemyslaw Koska
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+> Hint for myself: The MIT License is recommended for most personal and open-source software
+projects. It is simple, permissive, and allows others to use, modify, and distribute my code with 
+minimal restrictions. Apache License is more complex and suited for projects needing explicit patent
+ grants, while Creative Commons licenses are generally not recommended for software.
