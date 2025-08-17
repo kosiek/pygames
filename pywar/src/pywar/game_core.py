@@ -99,4 +99,3 @@ class CardGameService:
         Saves the current game state to the history.
         """
         await GameHistoryService.save_game_to_history_async(state)
-        print(f"Game saved: {state.player_a.name} vs {state.player_b.name}")

@@ -1,4 +1,5 @@
 from pytest import fixture, mark
+from assertpy import assert_that
 
 from pywar.game_core import CardGameService, CardGameState
 
@@ -17,10 +18,10 @@ class TestEndToEndGameSimulation:
         """This is a basic smoke test that simulates a game from start to finish.
 
         It initializes a game, deals cards to players, plays rounds until the game is over,
-        and finally checks if the game history is saved correctly.
+        creates a history record and then reads it.
 
         Args:
-            game (CardGameState): An instance of CardGameState to simulate the game.
+            game (CardGameState): An instance of initialized CardGameState to start the game.
         """
         game = CardGameService.deal_cards_to_players(game)
         while CardGameService.is_game_in_progress(game):
@@ -38,17 +39,15 @@ class TestEndToEndGameSimulation:
         print("Game history saved.")
 
         games = await CardGameService.get_games_from_history_async()
+        assert_that(games).is_not_empty()
 
-        if not games:
-            print("No games found in history.")
-        else:
-            print(f"{len(games)} games found in history:")
-            for i in games:
-                print(
-                    f"Game ID: {i.game_id}"
-                    f", Player A: {i.player_a.name!r}"
-                    f", Player B: {i.player_b.name!r}"
-                    f", Winner: {i.winner.name!r}.\n"
-                    f"\tWinner had {i.game_context['player_a_score']} points.\n"
-                    f"\tLoser had {i.game_context['player_b_score']} points.\n",
-                )
+        print(f"{len(games)} games found in history:")
+        for i in games:
+            print(
+                f"Game ID: {i.game_id}"
+                f", Player A: {i.player_a.name!r}"
+                f", Player B: {i.player_b.name!r}"
+                f", Winner: {i.winner.name!r}.\n"
+                f"\tWinner had {i.game_context['player_a_score']} points.\n"
+                f"\tLoser had {i.game_context['player_b_score']} points.\n",
+            )

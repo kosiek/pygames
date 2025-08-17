@@ -59,7 +59,7 @@ async def main_game():
         print(round)
         game = CardGameService.apply_round_result(game, round)
         print(f"{round.round_winner.name} has won this round.")
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.25)
 
     winner = game.select_winner()
     print(f"End game winner: {winner}")
@@ -67,21 +67,19 @@ async def main_game():
     await CardGameService.save_game_to_history_async(game)
     print("Game history saved.")
 
-    games = await CardGameService.get_games_from_history_async()
+    if not (games := await CardGameService.get_games_from_history_async()):
+        games = []
 
-    if not games:
-        print("No games found in history.")
-    else:
-        print(f"{len(games)} games found in history:")
-        for i in games:
-            print(
-                f"Game ID: {i.game_id}"
-                f", Player A: {i.player_a.name!r}"
-                f", Player B: {i.player_b.name!r}"
-                f", Winner: {i.winner.name!r}.\n"
-                f"\tWinner had {i.game_context['player_a_score']} points.\n"
-                f"\tLoser had {i.game_context['player_b_score']} points.\n",
-            )
+    print(f"{len(games)} games found in history:")
+    for i in games:
+        print(
+            f"Game ID: {i.game_id}"
+            f", Player A: {i.player_a.name!r}"
+            f", Player B: {i.player_b.name!r}"
+            f", Winner: {i.winner.name!r}.\n"
+            f"\tWinner had {i.game_context['player_a_score']} points.\n"
+            f"\tLoser had {i.game_context['player_b_score']} points.\n",
+        )
 
 
 if __name__ == "__main__":
